@@ -20,6 +20,7 @@ inline void vd_reset_all() {
 }
 
 inline void vd_set_color(const vd_color &value) {
+    vd_reset_all();
     vd_update_by_index(value, GPIO_PIN_SET);
 }
 
@@ -50,6 +51,7 @@ inline GPIO_PinState sw_read(const uint8_t &index) {
 }
 
 inline void sw_draw() {
+    led_reset_all();
     for (uint8_t index = 0; index < sw_size; ++index)
         led_update_by_index(index, sw_read(index));
 }
@@ -69,6 +71,7 @@ inline bool animation_check_condition_by_mask(const uint8_t &mask) {
 
 inline void animation_draw(uint8_t &current_frame) {
     static const uint8_t frames{10};
+    led_reset_all();
     uint8_t left = (current_frame <= (frames >> 1)) ? current_frame : frames - current_frame;
     led_update_by_index(left, GPIO_PIN_SET);
     led_update_by_index(left + 1, GPIO_PIN_SET);
@@ -95,16 +98,13 @@ int umain() {
             animation_update_state(is_animation);
             if (is_animation) {
                 vd_set_color(GREEN);
-                led_reset_all();
                 animation_draw(current_frame_number);
-            } else {
+            } else
                 vd_set_color(RED);
-            }
         } else {
             vd_set_color(YELLOW);
             current_frame_number = 0;
             is_animation = true;
-            led_reset_all();
             sw_draw();
         }
         HAL_Delay(delay_ms);
