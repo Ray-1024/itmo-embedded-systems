@@ -29,16 +29,16 @@ inline void vd_set_color(const vd_color &value) {
 const uint8_t led_size{8};
 
 
-inline void led_update_by_index(const uint8_t &index, const GPIO_PinState &state) {
+inline void led_write(const uint8_t &index, const GPIO_PinState &state) {
     static const uint64_t led_pins[]{GPIO_PIN_3, GPIO_PIN_4, GPIO_PIN_5,
                                      GPIO_PIN_6, GPIO_PIN_8, GPIO_PIN_9,
                                      GPIO_PIN_11, GPIO_PIN_12};
     HAL_GPIO_WritePin(GPIOD, led_pins[index], state);
 }
 
-inline void led_reset_all() {
+inline void led_fill() {
     for (uint8_t index = 0; index < led_size; ++index)
-        led_update_by_index(index, GPIO_PIN_RESET);
+        led_write(index, GPIO_PIN_RESET);
 }
 
 ////////////////////////////////   sw   ////////////////////////////////
@@ -51,9 +51,9 @@ inline GPIO_PinState sw_read(const uint8_t &index) {
 }
 
 inline void sw_draw() {
-    led_reset_all();
+    led_fill();
     for (uint8_t index = 0; index < sw_size; ++index)
-        led_update_by_index(index, sw_read(index));
+        led_write(index, sw_read(index));
 }
 
 ////////////////////////////////   animation   ////////////////////////////////
@@ -71,11 +71,11 @@ inline bool animation_check_condition_by_mask(const uint8_t &mask) {
 
 inline void animation_draw(uint8_t &current_frame) {
     static const uint8_t frames{10};
-    led_reset_all();
+    led_fill();
     uint8_t left = (current_frame <= (frames >> 1)) ? current_frame : frames - current_frame;
-    led_update_by_index(left, GPIO_PIN_SET);
-    led_update_by_index(left + 1, GPIO_PIN_SET);
-    led_update_by_index(left + 2, GPIO_PIN_SET);
+    led_write(left, GPIO_PIN_SET);
+    led_write(left + 1, GPIO_PIN_SET);
+    led_write(left + 2, GPIO_PIN_SET);
     current_frame = (current_frame + 1) % frames;
 }
 
